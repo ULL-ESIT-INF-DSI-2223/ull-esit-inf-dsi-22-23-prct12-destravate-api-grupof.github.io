@@ -5,9 +5,11 @@ const router = express.Router();
 
 // Rutas para usuarios
 router.get('/users', getUsers);
-router.get('/users/:id', getUserById);
-router.post('/users', createUser);
-router.put('/users/:id', updateUser);
-router.delete('/users/:id', deleteUser);
+router.get('/user/:id', getUserById);
+router.post('/user', createUser);
+router.patch('/user/:id', updateUser);
+router.patch('/user', updateUser);
+router.delete('/user/:id', deleteUser);
+router.delete('/user', deleteUser);
 
 export default router;

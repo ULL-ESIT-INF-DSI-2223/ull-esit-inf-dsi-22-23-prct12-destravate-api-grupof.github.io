@@ -4,24 +4,41 @@ import { userModel } from '../models/userSchema.js';
 // Obtener todos los usuarios
 export const getUsers = async (req: Request, res: Response) => {
   try {
-    const users = await userModel.find().populate('friends','name');
-    res.status(200).json(users);
-    console.log('Usuarios obtenidos correctamente');
+    const query = req.query;
+    if (query && query.id) {
+      const users = await userModel.find({ id: query.id }).populate('friends', 'name');
+      res.status(200).json(users);
+      console.log('Usuarios obtenidos correctamente');
+    } else {
+      const users = await userModel.find().populate('friends', 'name');
+      res.status(200).json(users);
+      console.log('Usuarios obtenidos correctamente');
+    }
   } catch (error : any) {
     res.status(500).json({ message: error.message });
     console.log('Error al obtener los usuarios');
   }
 };
 
-// Obtener un usuario por su ID
+// Obtener un usuario por su ID o por nombre
 export const getUserById = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const user = await userModel.findById(id);
-    if (!user) {
-      res.status(404).json({ message: 'Usuario no encontrado' });
+    const query = req.query;
+    if (query && query.id) {
+      const user = await userModel.findOne({ id: query.id });
+      if (!user) {
+        res.status(404).json({ message: 'Usuario no encontrado' });
+      } else {
+        res.status(200).json(user);
+      }
     } else {
-      res.status(200).json(user);
+      const { id } = req.params;
+      const user = await userModel.findById(id);
+      if (!user) {
+        res.status(404).json({ message: 'Usuario no encontrado' });
+      } else {
+        res.status(200).json(user);
+      }
     }
   } catch (error : any) {
     res.status(500).json({ message: error.message });
@@ -33,7 +50,7 @@ export const createUser = async (req: Request, res: Response) => {
   try {
     const user = new userModel(req.body);
     await user.save();
-    res.status(201).json(user);
+    res.status(201).json({ message: 'Usuario creado correctamente', user });
   } catch (error : any) {
     res.status(500).json({ message: error.message });
   }
@@ -41,19 +58,25 @@ export const createUser = async (req: Request, res: Response) => {
 
 // Actualizar un usuario existente
 export const updateUser = async (req: Request, res: Response) => {
-    console.log(req.body);
   try {
-    const { id } = req.params;
-    const user = await userModel.findByIdAndUpdate(id, req.body, { new: true });
-    if (!user) {
-        console.log('Usuario no encontrado');
-      res.status(404).json({ message: 'Usuario no encontrado' });
+    const query = req.query;
+    if (query && query.id) {
+      const user = await userModel.findOneAndUpdate({ id: query.id }, req.body, { new: true });
+      if (!user) {
+        res.status(404).json({ message: 'Usuario no encontrado' });
+      } else {
+        res.status(200).json({ message: 'Usuario actualizado correctamente' });
+      }
     } else {
-        console.log('Usuario actualizado correctamente');
-      res.status(200).json(user);
+      const { id } = req.params;
+      const user = await userModel.findByIdAndUpdate(id, req.body, { new: true });
+      if (!user) {
+        res.status(404).json({ message: 'Usuario no encontrado' });
+      } else {
+        res.status(200).json({ message: 'Usuario actualizado correctamente' });
+      }
     }
   } catch (error : any) {
-    console.log('Error al actualizar el usuario');
     res.status(500).json({ message: error.message });
   }
 };
@@ -61,12 +84,22 @@ export const updateUser = async (req: Request, res: Response) => {
 // Eliminar un usuario existente
 export const deleteUser = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const user = await userModel.findByIdAndDelete(id);
-    if (!user) {
-      res.status(404).json({ message: 'Usuario no encontrado' });
+    const query = req.query;
+    if (query && query.id) {
+      const user = await userModel.findOneAndDelete({ id: query.id });
+      if (!user) {
+        res.status(404).json({ message: 'Usuario no encontrado' });
+      } else {
+        res.status(200).json({ message: 'Usuario borrado correctamente' });
+      }
     } else {
-      res.status(200).json({ message: 'Usuario eliminado correctamente' });
+      const { id } = req.params;
+      const user = await userModel.findByIdAndDelete(id);
+      if (!user) {
+        res.status(404).json({ message: 'Usuario no encontrado' });
+      } else {
+        res.status(200).json({ message: 'Usuario borrado correctamente' });
+      }
     }
   } catch (error : any) {
     res.status(500).json({ message: error.message });
