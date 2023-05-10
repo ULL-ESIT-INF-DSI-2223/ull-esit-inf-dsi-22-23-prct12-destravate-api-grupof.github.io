@@ -36,8 +36,7 @@ const challengeSchema = new Schema<challengeDocumentInterface>({
         required: true,
     },
     users: {
-        type: [String],
-        required: true,
+        type: [String]
     },
 });
 

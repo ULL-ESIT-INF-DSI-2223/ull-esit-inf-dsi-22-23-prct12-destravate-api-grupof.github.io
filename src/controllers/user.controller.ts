@@ -4,17 +4,10 @@ import { userModel } from '../models/userSchema.js';
 // Obtener todos los usuarios
 export const getUsers = async (req: Request, res: Response) => {
   try {
-    const query = req.query;
-    if (query && query.id) {
-      const users = await userModel.find({ id: query.id }).populate('friends', 'name');
-      res.status(200).json(users);
-      console.log('Usuarios obtenidos correctamente');
-    } else {
       const users = await userModel.find().populate('friends', 'name');
       res.status(200).json(users);
       console.log('Usuarios obtenidos correctamente');
-    }
-  } catch (error : any) {
+    } catch (error : any) {
     res.status(500).json({ message: error.message });
     console.log('Error al obtener los usuarios');
   }
@@ -50,7 +43,7 @@ export const createUser = async (req: Request, res: Response) => {
   try {
     const user = new userModel(req.body);
     await user.save();
-    res.status(201).json({ message: 'Usuario creado correctamente', user });
+    res.status(200).json({ message: 'Usuario creado correctamente', user });
   } catch (error : any) {
     res.status(500).json({ message: error.message });
   }

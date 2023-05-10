@@ -2,6 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import { connect } from 'mongoose';
 import usersRouter from './routes/userRouter.js';
+import trackRouter from './routes/trackRouter.js';
+import groupRouter from './routes/groupRouter.js';
+
 const app = express();
 
 app.use(cors());
@@ -17,6 +20,8 @@ connect(uriLocal).then(() => {
 });
 
 app.use('/users', usersRouter);
+app.use('/tracks', trackRouter);
+app.use('/groups', groupRouter);
 
 app.use('/', (req, res) => {
   res.send('Hello World!');
@@ -24,10 +29,8 @@ app.use('/', (req, res) => {
 
 const PORT = process.env.PORT || 4000;
 
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
 
-
-export { server };
-export default server;
+export default app;

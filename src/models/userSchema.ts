@@ -1,5 +1,4 @@
 import { Schema, Document, model } from 'mongoose'
-import validator from 'validator'
 /*
 ID único del usuario (puede ser un username creado por el usuario en el registro o un valor generado automáticamente por el sistema).
 Nombre del usuario.
@@ -21,7 +20,7 @@ interface userDocumentInterface extends Document {
     //stats: string[];
     //favoriteRoutes: string[];
     //activeChallenges: string[];
-    historicRoutes: string[];
+    historicTracks: { _id: Schema.Types.ObjectId }[];
 }
 
 const userSchema = new Schema<userDocumentInterface>({
@@ -46,11 +45,10 @@ const userSchema = new Schema<userDocumentInterface>({
         type: Schema.Types.ObjectId,
         ref: "groups"
     }],
-    historicRoutes: {
-        type: [String]
-    },
-
-
+    historicTracks: [{
+        type: Schema.Types.ObjectId,
+        ref: "tracks"
+    }]
   });
 
   export const userModel = model<userDocumentInterface>('users', userSchema);

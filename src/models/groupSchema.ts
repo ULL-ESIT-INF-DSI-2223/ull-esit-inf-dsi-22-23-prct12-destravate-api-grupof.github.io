@@ -16,7 +16,7 @@ interface groupDocumentInterface extends Document {
     //stats: string[];
     //ranking: string[];
     //favoriteRoutes: string[];
-    historicRoutes: { _id: Schema.Types.ObjectId }[];
+    historicTracks: { _id: Schema.Types.ObjectId }[];
   }
 
 const groupSchema = new Schema<groupDocumentInterface>({
@@ -32,13 +32,11 @@ const groupSchema = new Schema<groupDocumentInterface>({
     participants: [{
         type: Schema.Types.ObjectId,
         ref: "users",
-        required: true
     }],
-    historicRoutes: [{
+    historicTracks: [{
         type: Schema.Types.ObjectId,
-        ref: "routes",
-        required: true
+        ref: "tracks",
     }],
 });
 
-export const GroupModel = model<groupDocumentInterface>('groups', groupSchema);
+export const groupModel = model<groupDocumentInterface>('groups', groupSchema);
