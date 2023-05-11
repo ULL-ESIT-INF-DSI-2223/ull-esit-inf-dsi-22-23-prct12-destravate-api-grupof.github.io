@@ -4,6 +4,7 @@ import { connect } from 'mongoose';
 import usersRouter from './routes/userRouter.js';
 import trackRouter from './routes/trackRouter.js';
 import groupRouter from './routes/groupRouter.js';
+import challengeRouter from './routes/challengeRouter.js';
 
 const app = express();
 
@@ -22,6 +23,7 @@ connect(uriLocal).then(() => {
 app.use('/users', usersRouter);
 app.use('/tracks', trackRouter);
 app.use('/groups', groupRouter);
+app.use('/challenges', challengeRouter);
 
 app.use('/', (req, res) => {
   res.send('Hello World!');

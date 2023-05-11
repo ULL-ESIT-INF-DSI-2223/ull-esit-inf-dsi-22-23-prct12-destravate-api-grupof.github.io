@@ -1,5 +1,4 @@
 import { Schema, Document, model } from 'mongoose'
-import validator from 'validator'
 /*
 ID único del reto.
 Nombre del reto.
@@ -11,10 +10,10 @@ Usuarios que están realizando el reto.
 interface challengeDocumentInterface extends Document {
     id: string;
     name: string;
-    routes: string[];
+    tracks: { _id: Schema.Types.ObjectId }[];
     activity: "Correr" | "Bicicleta";
     //totalKm: number;
-    users: string[];
+    users: { _id: Schema.Types.ObjectId }[];
 }
 
 const challengeSchema = new Schema<challengeDocumentInterface>({
@@ -27,17 +26,17 @@ const challengeSchema = new Schema<challengeDocumentInterface>({
         type: String,
         required: true,
     },
-    routes: {
-        type: [String],
-        required: true,
-    },
+    tracks: [{
+        type: Schema.Types.ObjectId,
+        ref: "tracks",
+    }],
     activity: {
         type: String,
-        required: true,
     },
-    users: {
-        type: [String]
-    },
+    users: [{
+        type: Schema.Types.ObjectId,
+        ref: "users",
+    }],
 });
 
 export const challengeModel = model<challengeDocumentInterface>('challenges', challengeSchema);

@@ -1,9 +1,7 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import mongoose from 'mongoose';
-import app from '../dist/serverTest.js';
+import app from '../dist/index.js';
 import { expect } from 'chai';
-import startServer from '../dist/index.js';
 import 'mocha'
 
 
@@ -34,12 +32,18 @@ describe('Group routes', () => {
         name: 'Test changed',
         
       }
-      before((done) => {
+      /*before((done) => {
         server = app.listen(4000, () => {
           console.log(`Server running on port 4000`);
+            mongooseServer.then(() => {
+            console.log('Connection to MongoDB server established');
+            }).catch(() => {
+            console.log('Unable to connect to MongoDB server');
+            });
+
           done();
         });
-      });
+      });*/
       
     describe('POST /:group', () => {
         //Crear usuarios
@@ -174,7 +178,7 @@ describe('Group routes', () => {
     });
     
     
-    after(async () => {
+   /* after(async () => {
         console.log('Closing server');
         await new Promise<void>((resolve) => {
           server.close(() => {
@@ -186,6 +190,6 @@ describe('Group routes', () => {
         console.log('Closing mongoose connection');
         await mongoose.connection.close();
         console.log('Mongoose connection closed');
-      });
+      });*/
       
-});     
+});

@@ -1,7 +1,7 @@
-/*import chai from 'chai';
+import chai from 'chai';
 import chaiHttp from 'chai-http';
 import mongoose from 'mongoose';
-import app from '../dist/serverTest.js';
+import app from '../dist/index.js';
 import { userModel } from '../dist/models/userSchema.js';
 import { expect } from 'chai';
 import startServer from '../dist/index.js';
@@ -23,12 +23,12 @@ describe('User routes', () => {
         name: 'Test',
         activities: 'Correr',
       };
-      before((done) => {
+      /*before((done) => {
         server = app.listen(4000, () => {
           console.log(`Server running on port 4000`);
           done();
         });
-      });
+      });*/
       
     describe('POST /:user', () => {
         //Crear usuarios
@@ -158,7 +158,7 @@ describe('User routes', () => {
         });
     });
     
-    after(async () => {
+    /*after(async () => {
         console.log('Closing server');
         await new Promise<void>((resolve) => {
           server.close(() => {
@@ -170,6 +170,6 @@ describe('User routes', () => {
         console.log('Closing mongoose connection');
         await mongoose.connection.close();
         console.log('Mongoose connection closed');
-      });
+      });*/
       
-});      */
+});     
