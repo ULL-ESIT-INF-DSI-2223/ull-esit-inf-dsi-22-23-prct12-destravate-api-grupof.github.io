@@ -20,7 +20,7 @@ interface userDocumentInterface extends Document {
     //stats: string[];
     //favoriteRoutes: string[];
     //activeChallenges: string[];
-    historicTracks: { _id: Schema.Types.ObjectId }[];
+    historicTracks: {date: Date, _id: Schema.Types.ObjectId }[];
 }
 
 const userSchema = new Schema<userDocumentInterface>({
@@ -46,8 +46,13 @@ const userSchema = new Schema<userDocumentInterface>({
         ref: "groups"
     }],
     historicTracks: [{
-        type: Schema.Types.ObjectId,
-        ref: "tracks"
+        date: {
+            type: Date,
+        },
+        track: {
+            type: Schema.Types.ObjectId,
+            ref: "tracks",
+        }
     }]
   });
 

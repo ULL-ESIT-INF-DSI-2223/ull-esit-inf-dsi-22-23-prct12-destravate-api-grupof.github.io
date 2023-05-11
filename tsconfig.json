@@ -3,6 +3,7 @@
     "tests",
     "./node_modules",
     "./dist",
+    "tests2",
   ],
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig to read more about this file */
