@@ -4,7 +4,8 @@ import { challengeModel } from '../models/challengeSchema.js';
 // Obtener todos los Retos
 export const getChallenges = async (req: Request, res: Response) => {
   try {
-    const challenges = await challengeModel.find();
+    const challenges = await challengeModel.find().populate('tracks');
+    
     res.status(200).json(challenges);
     console.log('Retos obtenidos correctamente');
   } catch (error : any) {
@@ -22,6 +23,7 @@ export const getChallengeById = async (req: Request, res: Response) => {
       if (!Challenge) {
         res.status(404).json({ message: 'Reto no encontrado' });
       } else {
+
         res.status(200).json(Challenge);
       }
     } else {

@@ -1,3 +1,4 @@
+import { Schema } from "mongoose";
 export function historyFunction(historicTracks: any): number []{
   
   
@@ -7,8 +8,8 @@ export function historyFunction(historicTracks: any): number []{
   const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
   const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
 
-  let result: number[] = [0,0,0,0,0,0]
-  let cont: number[] = [0,0,0]
+  const result: number[] = [0,0,0,0,0,0]
+  const cont: number[] = [0,0,0]
   historicTracks.forEach((track: any) => {
     // Convierte la fecha de la pista en un objeto Date
     const trackDate = new Date(track.date);
@@ -40,7 +41,7 @@ export function historyFunction(historicTracks: any): number []{
 }
 
 export function favoriteRoutes(historicTracks: any): {id: string, name: string, count: number }[] {
-  let routeCounts: { [key: string]: number } = {};
+  const routeCounts: { [key: string]: number } = {};
 
   historicTracks.forEach((track: any) => {
     const trackId = track.track.toString();
@@ -63,4 +64,22 @@ export function favoriteRoutes(historicTracks: any): {id: string, name: string, 
   });
 
   return topRoutes;
+}
+
+export function activeChallenges(challenges: any, id: string) {
+   //Buscar en el campo users los ids que coincidan con el id recibido
+   const result: {_id: Schema.Types.ObjectId, id: string, name: string} [] = [];
+  challenges.forEach((challenge: any) => {
+    challenge.users.forEach((user: any) => {
+      if(user._id == id){
+        result.push({_id: challenge._id.toString(), id: challenge.id, name: challenge.name});
+      }
+    })
+  })
+  return result;
+
+}
+
+export function challengeLong() {
+  //Buscar e
 }
