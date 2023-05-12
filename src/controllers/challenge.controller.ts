@@ -1,12 +1,15 @@
 import { Request, Response } from 'express';
 import { challengeModel } from '../models/challengeSchema.js';
+import { challengeLongAndUnevennes } from '../utils/historyFunctions.js';
 
 // Obtener todos los Retos
 export const getChallenges = async (req: Request, res: Response) => {
   try {
+
     const challenges = await challengeModel.find().populate('tracks');
-    
-    res.status(200).json(challenges);
+    //Añadir a cada challenge la distancia total de sus tracks y el desnivel medio
+    const challengesfinal = challengeLongAndUnevennes(challenges);
+    res.status(200).json(challengesfinal);
     console.log('Retos obtenidos correctamente');
   } catch (error : any) {
     res.status(500).json({ message: error.message });
@@ -19,20 +22,21 @@ export const getChallengeById = async (req: Request, res: Response) => {
   try {
     const query = req.query;
     if (query && query.id) {
-      const Challenge = await challengeModel.findOne({ id: query.id });
+      const Challenge = await challengeModel.findOne({ id: query.id }).populate('tracks');
       if (!Challenge) {
         res.status(404).json({ message: 'Reto no encontrado' });
       } else {
-
-        res.status(200).json(Challenge);
+        const challengesfinal = challengeLongAndUnevennes([Challenge]);
+        res.status(200).json(challengesfinal);
       }
     } else {
       const { id } = req.params;
-      const Challenge = await challengeModel.findById(id);
+      const Challenge = await challengeModel.findById(id).populate('tracks');
       if (!Challenge) {
         res.status(404).json({ message: 'Reto no encontrado' });
       } else {
-        res.status(200).json(Challenge);
+        const challengesfinal = challengeLongAndUnevennes([Challenge]);
+        res.status(200).json(challengesfinal);
       }
     }
   } catch (error : any) {

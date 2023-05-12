@@ -80,6 +80,19 @@ export function activeChallenges(challenges: any, id: string) {
 
 }
 
-export function challengeLong() {
-  //Buscar e
+export function challengeLongAndUnevennes(challenges: any[]): {challenge: any, kmTotal: number, unevenness: number }[] {
+  const challengesfinal: {challenge: any, kmTotal: number, unevenness: number }[] = [];
+    challenges.forEach((challenge: any) => {
+      let totalKm = 0;
+      let totalUnevenness = 0;
+      let cont = 0;
+      challenge.tracks.forEach((track: any) => {
+        totalKm += track.long;
+        totalUnevenness += track.unevenness;
+        cont++;
+      });
+      totalUnevenness /= cont;
+      challengesfinal.push({challenge: challenge, kmTotal: totalKm, unevenness: totalUnevenness});
+    });
+    return challengesfinal;
 }

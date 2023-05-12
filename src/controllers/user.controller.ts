@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { userModel } from '../models/userSchema.js';
 import { challengeModel } from '../models/challengeSchema.js';
 import { historyFunction, favoriteRoutes, activeChallenges} from '../utils/historyFunctions.js';
-import { getChallenges } from './challenge.controller.js';
 import mongoose from 'mongoose';
 
 // Obtener todos los usuarios
