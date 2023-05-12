@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { userModel } from '../models/userSchema.js';
-import { historyFunction } from '../utils/historyFunctions.js';
+import { historyFunction, favoriteRoutes } from '../utils/historyFunctions.js';
 import mongoose from 'mongoose';
 
 // Obtener todos los usuarios
@@ -26,7 +26,8 @@ export const getUserById = async (req: Request, res: Response) => {
       } else {
         
         const stats = historyFunction(user.historicTracks);
-        res.status(200).json({user: user, stats:{"km semanales": stats[0],"Desnivel semanal": stats[1], "km mensuales": stats[2],"Desnivel mensual": stats[3], "km anuales": stats[4], "Desnivel anual": stats[5]}});
+        const favTracks = favoriteRoutes(user.historicTracks);
+        res.status(200).json({user: user, stats:{"km semanales": stats[0],"Desnivel semanal": stats[1], "km mensuales": stats[2],"Desnivel mensual": stats[3], "km anuales": stats[4], "Desnivel anual": stats[5]}, favTracks});
       }
     } else {
       const { id } = req.params;

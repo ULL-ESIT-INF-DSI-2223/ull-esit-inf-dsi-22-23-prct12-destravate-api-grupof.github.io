@@ -35,4 +35,6 @@ app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
 
+console.log(Date.now())
+
 export default app;

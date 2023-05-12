@@ -1,4 +1,3 @@
-import {Schema} from "mongoose"
 export function historyFunction(historicTracks: any): number []{
   
   
@@ -38,4 +37,30 @@ export function historyFunction(historicTracks: any): number []{
      result[5] /= cont[2];
   return result;
 
+}
+
+export function favoriteRoutes(historicTracks: any): {id: string, name: string, count: number }[] {
+  let routeCounts: { [key: string]: number } = {};
+
+  historicTracks.forEach((track: any) => {
+    const trackId = track.track.toString();
+    if (routeCounts.hasOwnProperty(trackId)) {
+      routeCounts[trackId]++;
+    } else {
+      routeCounts[trackId] = 1;
+    }
+  });
+
+  const sortedRoutes = Object.entries(routeCounts).sort(
+    ([, countA], [, countB]) => countB - countA
+  );
+
+  const topRoutes = sortedRoutes.map(([trackId, count]) => {
+    const track = historicTracks.find((track: any) => track.track.toString() === trackId);
+    const name = track ? track.track.name : "Unknown"; // Obtener el nombre de la ruta
+    const id = track ? track.track.id : "Unknown"; // Obtener el nombre de la ruta
+    return {id, name, count };
+  });
+
+  return topRoutes;
 }
