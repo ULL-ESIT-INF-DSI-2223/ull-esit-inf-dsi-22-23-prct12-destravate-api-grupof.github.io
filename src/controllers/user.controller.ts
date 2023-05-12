@@ -24,7 +24,6 @@ export const getUserById = async (req: Request, res: Response) => {
       if (!user) {
         res.status(404).json({ message: 'Usuario no encontrado' });
       } else {
-        
         const stats = historyFunction(user.historicTracks);
         const favTracks = favoriteRoutes(user.historicTracks);
         res.status(200).json({user: user, stats:{"km semanales": stats[0],"Desnivel semanal": stats[1], "km mensuales": stats[2],"Desnivel mensual": stats[3], "km anuales": stats[4], "Desnivel anual": stats[5]}, favTracks});
@@ -36,8 +35,8 @@ export const getUserById = async (req: Request, res: Response) => {
         res.status(404).json({ message: 'Usuario no encontrado' });
       } else {
         const stats = historyFunction(user.historicTracks);
-        console.log(stats)
-        res.status(200).json(user);
+        const favTracks = favoriteRoutes(user.historicTracks);
+        res.status(200).json({user: user, stats:{"km semanales": stats[0],"Desnivel semanal": stats[1], "km mensuales": stats[2],"Desnivel mensual": stats[3], "km anuales": stats[4], "Desnivel anual": stats[5]}, favTracks});
       }
     }
   } catch (error : any) {
