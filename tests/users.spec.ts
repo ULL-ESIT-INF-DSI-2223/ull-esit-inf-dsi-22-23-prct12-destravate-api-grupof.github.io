@@ -23,12 +23,6 @@ describe('User routes', () => {
         name: 'Test',
         activities: 'Correr',
       };
-      /*before((done) => {
-        server = app.listen(4000, () => {
-          console.log(`Server running on port 4000`);
-          done();
-        });
-      });*/
       
     describe('POST /:user', () => {
         //Crear usuarios
@@ -157,19 +151,5 @@ describe('User routes', () => {
             });
         });
     });
-    
-    /*after(async () => {
-        console.log('Closing server');
-        await new Promise<void>((resolve) => {
-          server.close(() => {
-            console.log('Server closed');
-            resolve();
-          });
-        });
-      
-        console.log('Closing mongoose connection');
-        await mongoose.connection.close();
-        console.log('Mongoose connection closed');
-      });*/
       
 });     
