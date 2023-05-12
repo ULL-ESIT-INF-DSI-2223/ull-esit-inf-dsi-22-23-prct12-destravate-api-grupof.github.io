@@ -21,7 +21,7 @@ jobs:
           node-version: 19.x
       - name: Installing dependencies
         run: npm i
-       - name: Compiling TypeScript
+      - name: Compiling TypeScript
         run: tsc
       - name: Generating coverage information
         run: npm run coverage
