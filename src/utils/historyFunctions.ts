@@ -32,10 +32,23 @@ export function historyFunction(historicTracks: any): number []{
           cont[2]++;  
         }
      });
+     //Asegurarse de que si alguno es 0 no devuelva NaN
 
      result[1] /= cont[0];
      result[3] /= cont[1];
      result[5] /= cont[2];
+      
+     if(isNaN(result[1])){
+       result[1] = 0;
+     }
+      if(isNaN(result[3])){
+        result[3] = 0;
+      }
+      if(isNaN(result[5])){
+        result[5] = 0;
+      }
+
+    
   return result;
 
 }

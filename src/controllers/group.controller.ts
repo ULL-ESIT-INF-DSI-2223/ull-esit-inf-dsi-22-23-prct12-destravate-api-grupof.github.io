@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
 import { groupModel } from '../models/groupSchema.js';
-import { historyFunction } from '../utils/historyFunctions.js';
+import { userModel } from '../models/userSchema.js';
+import { trackModel } from '../models/trackSchema.js';
+import { historyFunction, favoriteRoutes} from '../utils/historyFunctions.js';
+import { Types, Schema } from 'mongoose';
 
 // Obtener todas las Grupos
 export const getGroups = async (req: Request, res: Response) => {
@@ -24,9 +27,12 @@ export const getGroupById = async (req: Request, res: Response) => {
       if (!Group) {
         res.status(404).json({ message: 'Grupo no encontrado' });
       } else {
-        
+      const favTracks = favoriteRoutes(Group.historicTracks);
       const stats = historyFunction(Group.historicTracks);
-        res.status(200).json({Group, stats:{"km semanales": stats[0],"Desnivel semanal": stats[1], "km mensuales": stats[2],"Desnivel mensual": stats[3], "km anuales": stats[4], "Desnivel anual": stats[5]}});
+        const rankingusers = await groupModel.findOne({ id: query.id }).populate('participants', '_id')
+        
+       console.log(rankingusers)
+        res.status(200).json({Group, stats:{"km semanales": stats[0],"Desnivel semanal": stats[1], "km mensuales": stats[2],"Desnivel mensual": stats[3], "km anuales": stats[4], "Desnivel anual": stats[5]}, favTracks});
       }
     } else {
       const { id } = req.params;
@@ -34,8 +40,9 @@ export const getGroupById = async (req: Request, res: Response) => {
       if (!Group) {
         res.status(404).json({ message: 'Grupo no encontrado' });
       } else {
+        const favTracks = favoriteRoutes(Group.historicTracks);
         const stats = historyFunction(Group.historicTracks);
-        res.status(200).json({Group, stats:{"km semanales": stats[0],"Desnivel semanal": stats[1], "km mensuales": stats[2],"Desnivel mensual": stats[3], "km anuales": stats[4], "Desnivel anual": stats[5]}});
+        res.status(200).json({Group, stats:{"km semanales": stats[0],"Desnivel semanal": stats[1], "km mensuales": stats[2],"Desnivel mensual": stats[3], "km anuales": stats[4], "Desnivel anual": stats[5]}, favTracks});
       }
     }
   } catch (error : any) {
