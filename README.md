@@ -114,6 +114,46 @@ La operación de lectura o consulta podrá llevarse a cabo de dos maneras difere
 
 >
 
+La estructura de nuestro código TypeScript es la siguiente, donde src es la carpeta donde se encuentra el código fuente de la aplicación, tests es la carpeta donde se encuentra el código fuente de los tests, docs es la carpeta donde se encuentra la documentación generada por TypeDoc, coverage es la carpeta donde se encuentra la información de la cobertura de los tests y node_modules es la carpeta donde se encuentran las dependencias de nuestro proyecto.
+
+Dentro del directorio src, tenemos los siguientes directorios y ficheros:
+
+- controllers: contiene los controladores de la aplicación.
+- database: contiene el fichero de configuración de la base de datos.
+- odels: contiene los modelos de la aplicación.
+- routes: contiene las rutas de la aplicación.
+- utils: contiene las funciones auxiliares de la aplicación.
+- index.ts: fichero principal de la aplicación.
+- serverTest.ts: fichero principal de los tests.
+
+.github
+coverage
+docs
+node_modules
+src
+├── controllers
+│   ├── challenge.controller.ts
+│   ├── group.controller.ts
+│   ├── track.controller.ts
+│   └── user.controller.ts
+├── database
+│   └── mongoose.ts
+├── index.ts
+├── models
+│   ├── challengeSchema.ts
+│   ├── groupSchema.ts
+│   ├── trackSchema.ts
+│   └── userSchema.ts
+├── routes
+│   ├── challengeRouter.ts
+│   ├── groupRouter.ts
+│   ├── trackRouter.ts
+│   └── userRouter.ts
+├── serverTest.ts
+└── utils
+    └── historyFunctions.ts
+tests
+
 ### Schemas <a name="schemas"></a>
 > [Volver al índice](#índice)
 
