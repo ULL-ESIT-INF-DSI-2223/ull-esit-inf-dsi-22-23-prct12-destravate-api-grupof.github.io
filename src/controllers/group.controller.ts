@@ -20,6 +20,7 @@ export const getGroups = async (req: Request, res: Response) => {
 
 // Obtener una Grupo por su ID
 export const getGroupById = async (req: Request, res: Response) => {
+  console.log(req.params)
   try {
     const query = req.query;
     if (query && query.id) {
@@ -29,7 +30,7 @@ export const getGroupById = async (req: Request, res: Response) => {
       } else {
       const favTracks = favoriteRoutes(Group.historicTracks);
       const stats = historyFunction(Group.historicTracks);
-        const rankingusers = await groupModel.findOne({ id: query.id }).populate('participants', '_id')
+      const rankingusers = await groupModel.findOne({ id: query.id }).populate('participants', '_id')
         
        console.log(rankingusers)
         res.status(200).json({Group, stats:{"km semanales": stats[0],"Desnivel semanal": stats[1], "km mensuales": stats[2],"Desnivel mensual": stats[3], "km anuales": stats[4], "Desnivel anual": stats[5]}, favTracks});
@@ -119,6 +120,28 @@ export const addTrackToHistory = async (req: Request, res: Response) => {
     const group = await groupModel.findByIdAndUpdate(
       groupId, 
       { $push: { historicTracks: { date: new Date(date), track: track } } }, 
+      { new: true, useFindAndModify: false } // new: true para devolver el documento actualizado, useFindAndModify: false para utilizar el método findOneAndUpdate de Mongoose en lugar del método findAndModify de MongoDB
+    );
+
+    if (!group) {
+      return res.status(404).send('group not found');
+    }
+
+    return res.send(group);
+
+  } catch (error) {
+    return res.status(500).send('Server error');
+  }
+};
+
+export const addUserToGroup = async (req: Request, res: Response) => {
+  try {
+    const groupId = req.params.id;
+    const { date, user } = req.body; // Asegúrate de que el cuerpo de la petición incluye la fecha y el ID de la pista
+    // Encuentra el usuario y actualiza su array historicTracks
+    const group = await groupModel.findByIdAndUpdate(
+      groupId, 
+      { $push: { participants: { date: new Date(date), user: user } } }, 
       { new: true, useFindAndModify: false } // new: true para devolver el documento actualizado, useFindAndModify: false para utilizar el método findOneAndUpdate de Mongoose en lugar del método findAndModify de MongoDB
     );
 

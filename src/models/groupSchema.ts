@@ -12,7 +12,7 @@ Histórico de rutas realizadas por el grupo: Información similar que almacenan 
 interface groupDocumentInterface extends Document {
     id: string;
     name: string;
-    participants: { _id: Schema.Types.ObjectId }[];
+    participants: {date: Date, _id: Schema.Types.ObjectId }[];
     //stats: string[];
     //ranking: string[];
     //favoriteRoutes: string[];
@@ -30,8 +30,13 @@ const groupSchema = new Schema<groupDocumentInterface>({
         required: true,
     },
     participants: [{
-        type: Schema.Types.ObjectId,
-        ref: "users",
+        date: {
+            type: Date,
+        },
+        user: {
+            type: Schema.Types.ObjectId,
+            ref: "users",
+        }
     }],
     historicTracks: [{
         date: {
