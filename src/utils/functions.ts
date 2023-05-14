@@ -109,3 +109,49 @@ export function challengeLongAndUnevennes(challenges: any[]): {challenge: any, k
     });
     return challengesfinal;
 }
+
+export function groupClasificationUsers(participants: any, historicTracks:any): {byKms:{id: string,name: string, long: number, unevenness: number}[],byUnevenness:{id: string,name: string, long: number, unevenness: number }[]}{
+  const resultKms: {id: string,name: string, long: number, unevenness: number }[] = [];
+  const resultUnevenness: {id: string,name: string, long: number, unevenness: number }[]= [];
+  participants.forEach((participant: any) => {
+    let totalKm = 0;
+    let totalUnevenness = 0;
+    let cont = 0;
+    historicTracks.forEach((track: any) => {
+      if(track.date > participant.date){
+        totalKm += track.track.long;
+        totalUnevenness += track.track.unevenness;
+        cont++;
+      }
+    });
+    if (cont == 0 || totalUnevenness == 0) {
+      totalUnevenness = 0;
+    } else {
+      totalUnevenness /= cont;
+    }
+    resultKms.push({id: participant.id, name: participant.user.name, long: totalKm, unevenness: totalUnevenness});
+    resultUnevenness.push({id: participant.id, name: participant.user.name, long: totalKm, unevenness: totalUnevenness});
+  });
+  // Devolver el array ordenado por cantidad de kilómetros, de mayor a menor, solo los 3 primeros, si son menos de 3, devolver los que haya
+  resultKms.sort((a, b) => (a.long < b.long) ? 1 : -1);
+  resultKms.splice(3);
+  // Devolver el array ordenado por cantidad de desnivel, de mayor a menor, solo los 3 primeros, si son menos de 3, devolver los que haya
+  resultUnevenness.sort((a, b) => (a.unevenness < b.unevenness) ? 1 : -1);
+  resultUnevenness.splice(3);
+  const result = {byKms: resultKms, byUnevenness: resultUnevenness};
+  return result;
+}
+
+export function getGroupForUser(groups:any, id: string): {id: string, name: string}[]{
+  const result: {id: string, name: string}[] = [];
+  groups.forEach((group: any) => {
+    group.participants.forEach((participant: any) => {
+      if(participant.user.id == id){
+        result.push({id: group._id.toString(), name: group.name});
+      }
+    }
+    )
+  })
+  
+  return result;
+}

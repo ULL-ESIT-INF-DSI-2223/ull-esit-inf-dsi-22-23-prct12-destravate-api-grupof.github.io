@@ -16,10 +16,6 @@ interface userDocumentInterface extends Document {
     name: string;
     activities: "Correr" | "Bicicleta";
     friends: { _id: Schema.Types.ObjectId }[];
-    groups: { _id: Schema.Types.ObjectId }[];
-    //stats: string[];
-    //favoriteRoutes: string[];
-    //activeChallenges: string[];
     historicTracks: {date: Date, _id: Schema.Types.ObjectId }[];
 }
 
@@ -40,10 +36,6 @@ const userSchema = new Schema<userDocumentInterface>({
     friends: [{
         type: Schema.Types.ObjectId,
         ref: "users"
-    }],
-    groups: [{
-        type: Schema.Types.ObjectId,
-        ref: "groups"
     }],
     historicTracks: [{
         date: {

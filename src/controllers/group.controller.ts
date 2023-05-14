@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { groupModel } from '../models/groupSchema.js';
 import { userModel } from '../models/userSchema.js';
 import { trackModel } from '../models/trackSchema.js';
-import { historyFunction, favoriteRoutes} from '../utils/historyFunctions.js';
+import { historyFunction, favoriteRoutes, groupClasificationUsers} from '../utils/functions.js';
 import { Types, Schema } from 'mongoose';
 
 // Obtener todas las Grupos
@@ -24,27 +24,25 @@ export const getGroupById = async (req: Request, res: Response) => {
   try {
     const query = req.query;
     if (query && query.id) {
-      const Group = await groupModel.findOne({ id: query.id }).populate('participants', 'name').populate('historicTracks.track');
+      const Group = await groupModel.findOne({ id: query.id }).populate('participants.user', 'name').populate('historicTracks.track');
       if (!Group) {
         res.status(404).json({ message: 'Grupo no encontrado' });
       } else {
       const favTracks = favoriteRoutes(Group.historicTracks);
       const stats = historyFunction(Group.historicTracks);
-      const rankingusers = await groupModel.findOne({ id: query.id }).populate('participants', '_id')
-        
-       console.log(rankingusers)
-        res.status(200).json({Group, stats:{"km semanales": stats[0],"Desnivel semanal": stats[1], "km mensuales": stats[2],"Desnivel mensual": stats[3], "km anuales": stats[4], "Desnivel anual": stats[5]}, favTracks});
+      const rankingusers = groupClasificationUsers(Group.participants, Group.historicTracks)
+        res.status(200).json({Group, stats:{"km semanales": stats[0],"Desnivel semanal": stats[1], "km mensuales": stats[2],"Desnivel mensual": stats[3], "km anuales": stats[4], "Desnivel anual": stats[5]}, favTracks, rankingusers});
       }
     } else {
       const { id } = req.params;
-      const Group = await groupModel.findById(id).populate('participants', 'name').populate('historicTracks.track');
+      const Group = await groupModel.findById(id).populate('participants.user', 'name').populate('historicTracks.track');
       if (!Group) {
         res.status(404).json({ message: 'Grupo no encontrado' });
       } else {
         const favTracks = favoriteRoutes(Group.historicTracks);
         const stats = historyFunction(Group.historicTracks);
-        res.status(200).json({Group, stats:{"km semanales": stats[0],"Desnivel semanal": stats[1], "km mensuales": stats[2],"Desnivel mensual": stats[3], "km anuales": stats[4], "Desnivel anual": stats[5]}, favTracks});
-      }
+        const rankingusers = groupClasificationUsers(Group.participants, Group.historicTracks)
+        res.status(200).json({Group, stats:{"km semanales": stats[0],"Desnivel semanal": stats[1], "km mensuales": stats[2],"Desnivel mensual": stats[3], "km anuales": stats[4], "Desnivel anual": stats[5]}, favTracks, rankingusers});      }
     }
   } catch (error : any) {
     res.status(500).json({ message: error.message });

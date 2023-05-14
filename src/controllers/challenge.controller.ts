@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { challengeModel } from '../models/challengeSchema.js';
-import { challengeLongAndUnevennes } from '../utils/historyFunctions.js';
+import { challengeLongAndUnevennes } from '../utils/functions.js';
 
 // Obtener todos los Retos
 export const getChallenges = async (req: Request, res: Response) => {

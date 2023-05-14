@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import { userModel } from '../models/userSchema.js';
 import { challengeModel } from '../models/challengeSchema.js';
-import { historyFunction, favoriteRoutes, activeChallenges} from '../utils/historyFunctions.js';
+import { groupModel } from '../models/groupSchema.js';
+import { historyFunction, favoriteRoutes, activeChallenges, getGroupForUser} from '../utils/functions.js';
 import mongoose from 'mongoose';
 
 // Obtener todos los usuarios
@@ -21,15 +22,17 @@ export const getUserById = async (req: Request, res: Response) => {
   try {
     const query = req.query;
     if (query && query.id) {
-      const user = await userModel.findOne({ id: query.id }).populate('friends', 'name').populate('historicTracks.track');
+      const user = await userModel.findOne({ id: query.id }).populate('friends',['id','name']).populate('historicTracks.track');
       if (!user) {
         res.status(404).json({ message: 'Usuario no encontrado' });
       } else {
+        const Groups = await groupModel.find().populate('participants.user', ['id','name'])
+        const activeGroups = getGroupForUser(Groups, user.id)
         const stats = historyFunction(user.historicTracks);
         const favTracks = favoriteRoutes(user.historicTracks);
         const challenges = await challengeModel.find();
         const activChallenges = activeChallenges(challenges, user._id.toString());
-        res.status(200).json({user: user, stats:{"km semanales": stats[0],"Desnivel semanal": stats[1], "km mensuales": stats[2],"Desnivel mensual": stats[3], "km anuales": stats[4], "Desnivel anual": stats[5]}, favTracks, activChallenges});
+        res.status(200).json({user: user, activeGroups, stats:{"km semanales": stats[0],"Desnivel semanal": stats[1], "km mensuales": stats[2],"Desnivel mensual": stats[3], "km anuales": stats[4], "Desnivel anual": stats[5]}, favTracks, activChallenges});
       }
     } else {
       const { id } = req.params;
