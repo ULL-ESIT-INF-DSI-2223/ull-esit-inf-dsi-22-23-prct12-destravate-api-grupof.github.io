@@ -20,8 +20,6 @@ connect(MONGO_URI).then(() => {
   console.log('Unable to connect to MongoDB server');
 });
 
-});
-
 app.use('/users', usersRouter);
 app.use('/tracks', trackRouter);
 app.use('/groups', groupRouter);
