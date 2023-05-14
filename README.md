@@ -142,7 +142,7 @@ src
 │   └── userRouter.ts
 ├── serverTest.ts
 └── utils
-    └── historyFunctions.ts
+    └── functions.ts
 tests
 ├── challenge.spec.ts
 ├── group.spec.ts
@@ -298,7 +298,7 @@ Luego, se define una interfaz groupDocumentInterface que define la forma de los 
 - participants: una lista de IDs de los miembros del grupo
 - historicTracks: una lista de las rutas realizadas por el grupo, junto con las fechas en que se realizaron.
 
-A continuación, se define un esquema groupSchema utilizando la interfaz definida anteriormente. El esquema especifica los tipos y las restricciones de los campos definidos en la interfaz. En este caso, el campo "id" es obligatorio, único y debe ser una cadena de caracteres. El campo "name" es obligatorio y también debe ser una cadena de caracteres. El campo "participants" es una matriz de ObjectIds que se refieren a documentos de usuarios en la colección "users" de la base de datos. El campo "historicTracks" es una matriz de objetos que contienen una fecha y una referencia a un documento de pista en la colección "tracks" de la base de datos.
+A continuación, se define un esquema groupSchema utilizando la interfaz definida anteriormente. El esquema especifica los tipos y las restricciones de los campos definidos en la interfaz. En este caso, el campo "id" es obligatorio, único y debe ser una cadena de caracteres. El campo "name" es obligatorio y también debe ser una cadena de caracteres. El campo "participants" es una matriz de ObjectIds que se refieren a documentos de usuarios en la colección "users" de la base de datos. El campo "historicTracks" es una matriz de objetos que contienen una fecha y una referencia a un documento de ruta en la colección "tracks" de la base de datos.
 
 Finalmente, se exporta el modelo de grupo utilizando el esquema definido y el método model() de Mongoose. El modelo se guarda en la variable groupModel.
 
@@ -654,7 +654,11 @@ El código importa varias funciones desde el módulo ../controllers/user.control
 ### Controladores <a name="controladores"></a>
 > [Volver al índice](#índice)
 
-> En la carpeta controllers se encuentran los controladores de la aplicación. Estos controladores son los que se encargan de realizar las operaciones de la API. Los controladores son los siguientes:
+> En la carpeta controllers se encuentran los controladores de la aplicación. Estos controladores son los que se encargan de realizar las operaciones de la API. Este conjunto de controladores es el que que maneja mediante funciones la información de las diferentes peticiones HTTP en una API construida con el framework Express y utilizando una base de datos MongoDB alojada en Atlas.
+
+La API se utiliza para interactuar con una base de datos que contiene información sobre grupos de corredores y las rutas que han recorrido.
+
+Los controladores son los siguientes:
 
 - challenge.controller.ts: controlador de los retos.
 - group.controller.ts: controlador de los grupos.
@@ -665,24 +669,571 @@ A contiuación explicaremos brevemente la estructura de cada uno de los controla
 
 #### ChallengeController.ts <a name="challengeController"></a>
 
-````typescript	
+> El controlador de los retos es el que se encarga de gestionar las peticiones relacionadas con los retos:
 
+````typescript	
+import { Request, Response } from 'express';
+import { challengeModel } from '../models/challengeSchema.js';
+import { challengeLongAndUnevennes } from '../utils/functions.js';
+
+// Obtener todos los Retos
+export const getChallenges = async (req: Request, res: Response) => {
+  try {
+
+    const challenges = await challengeModel.find().populate('tracks');
+    //Añadir a cada challenge la distancia total de sus tracks y el desnivel medio
+    const challengesfinal = challengeLongAndUnevennes(challenges);
+    res.status(200).json(challengesfinal);
+    console.log('Retos obtenidos correctamente');
+  } catch (error : any) {
+    res.status(500).json({ message: error.message });
+    console.log('Error al obtener los retos');
+  }
+};
+
+// Obtener una Reto por su ID
+export const getChallengeById = async (req: Request, res: Response) => {
+  try {
+    const query = req.query;
+    if (query && query.id) {
+      const Challenge = await challengeModel.findOne({ id: query.id }).populate('tracks');
+      if (!Challenge) {
+        res.status(404).json({ message: 'Reto no encontrado' });
+      } else {
+        const challengesfinal = challengeLongAndUnevennes([Challenge]);
+        res.status(200).json(challengesfinal);
+      }
+    } else {
+      const { id } = req.params;
+      const Challenge = await challengeModel.findById(id).populate('tracks');
+      if (!Challenge) {
+        res.status(404).json({ message: 'Reto no encontrado' });
+      } else {
+        const challengesfinal = challengeLongAndUnevennes([Challenge]);
+        res.status(200).json(challengesfinal);
+      }
+    }
+  } catch (error : any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Crear una nueva Reto
+export const createChallenge = async (req: Request, res: Response) => {
+  try {
+    const challenge = new challengeModel(req.body);
+    await challenge.save();
+    res.status(200).json({ message: 'Reto creado correctamente' , challenge });
+  } catch (error : any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Actualizar una Reto existente
+export const updateChallenge = async (req: Request, res: Response) => {
+  try {
+    const query = req.query;
+    if (query && query.id) {
+      const Challenge = await challengeModel.findOneAndUpdate({ id: query.id }, req.body, { new: true });
+      if (!Challenge) {
+        res.status(404).json({ message: 'Reto no encontrado' });
+      } else {
+        res.status(200).json({ message: 'Reto actualizado correctamente' });
+      }
+    } else {
+      const { id } = req.params;
+      const Challenge = await challengeModel.findByIdAndUpdate(id, req.body, { new: true });
+      if (!Challenge) {
+        res.status(404).json({ message: 'Reto no encontrado' });
+      } else {
+        res.status(200).json({ message: 'Reto actualizado correctamente' });
+      }
+    }
+  } catch (error : any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Eliminar una Reto existente
+export const deleteChallenge = async (req: Request, res: Response) => {
+  try {
+    const query = req.query;
+    if (query && query.id) {
+      const Challenge = await challengeModel.findOneAndDelete({ id: query.id });
+      if (!Challenge) {
+        res.status(404).json({ message: 'Reto no encontrado' });
+      } else {
+        res.status(200).json({ message: 'Reto borrado correctamente' });
+      }
+    } else {
+      const { id } = req.params;
+      const Challenge = await challengeModel.findByIdAndDelete(id);
+      if (!Challenge) {
+        res.status(404).json({ message: 'Reto no encontrado' });
+      } else {
+        res.status(200).json({ message: 'Reto borrado correctamente' });
+      }
+    }
+  } catch (error : any) {
+    res.status(500).json({ message: error.message });
+  }
+};
 ````	
+La primera función, getChallenges, se encarga de obtener todos los retos almacenados en la base de datos, calcular la distancia total de los tracks de cada uno y su desnivel medio, y devolver una respuesta HTTP con un código de estado 200 y un objeto JSON que contiene los retos y su información de distancia y desnivel.
+
+La segunda función, getChallengeById, se encarga de obtener un reto en específico, ya sea por su ID (cuando se pasa como un parámetro de consulta) o por el ID que se encuentra en los parámetros de la URL. La función también calcula la distancia total y el desnivel medio del reto antes de devolver la respuesta HTTP.
+
+La tercera función, createChallenge, se encarga de crear un nuevo reto a partir de la información proporcionada en la petición HTTP. El objeto JSON que representa el nuevo reto se guarda en la base de datos y se devuelve una respuesta HTTP con un código de estado 200 y un mensaje de confirmación.
+
+La cuarta función, updateChallenge, actualiza un reto existente en la base de datos, ya sea por su ID (pasado como un parámetro de consulta) o por el ID que se encuentra en los parámetros de la URL. La función utiliza la información proporcionada en la petición HTTP para actualizar el reto y devuelve una respuesta HTTP con un código de estado 200 y un mensaje de confirmación.
+
+La quinta función, deleteChallenge, se encarga de eliminar un reto existente de la base de datos, ya sea por su ID (pasado como un parámetro de consulta) o por el ID que se encuentra en los parámetros de la URL. La función elimina el reto y devuelve una respuesta HTTP con un código de estado 200 y un mensaje de confirmación.
 
 #### GroupController.ts <a name="groupController"></a>
 
+El controlador de grupos contiene las funciones necesarias para gestionar los grupos de usuarios de la aplicación. 
+
 ````typescript	
+import chai from 'chai';
+import chaiHttp from 'chai-http';
+import app from '../dist/index.js';
+import { expect } from 'chai';
+import 'mocha'
+
+chai.use(chaiHttp);
+describe('Group routes', () => {
+    let _idTestGroup: string;
+    let server: any;
+    const testGroup1 = {
+      id: "GroupTest1",
+      name: 'Test',
+      participants: [],
+      historicTracks: [],
+     
+    };
+    const testGroup1Modi = {
+        id: "GroupTest1",
+        name: 'Test changed',
+        
+      }
+    const testGroup2 = {
+        id: "GroupTest2",
+        name: 'Test',
+       
+      };
+      const testGroup2Modi = {
+        id: "GroupTest2",
+        name: 'Test changed',
+        
+      }
+      
+    describe('POST /:group', () => {
+        //Crear usuarios
+        it('should add a testGroup1', (done) => {
+        chai
+            .request(app)
+            .post(`/groups/group`)
+            .set('Content-Type', 'application/json')
+            .send(testGroup1)
+            .end((err, res) => {
+            _idTestGroup = res.body.group._id
+            console.log("GROUP: ")
+            console.log(_idTestGroup);
+            expect(err).to.be.null;
+            expect(res).to.have.status(200);
+            
+            done();
+            });
+        });
+        it('should add a testGroup2', (done) => {
+            chai
+                .request(app)
+                .post(`/groups/group`)
+                .set('Content-Type', 'application/json')
+                .send(testGroup2)
+                .end((err, res) => {
+                expect(err).to.be.null;
+                expect(res).to.have.status(200);
+                done();
+                });
+            });
+       
+    //Errores al crear usuarios
+    it('should give us an error when try to add a new thats not correct', (done) => {
+        chai
+            .request(app)
+            .post(`/groups/group`)
+            .set('Content-Type', 'application/json')
+            .send({id: testGroup1.id, name : testGroup1.name})
+            .end((err, res) => {
+            expect(res).to.have.status(500);
+            done();
+            });
+        });
+    });
+    //Modificar usuarios
+   describe('PATCH /:Group', () => {
+        it('Should change name of testGroup1 by id', (done) => {
+            chai
+                .request(app)
+                .patch(`/groups/group/${_idTestGroup}`)
+                .set('Content-Type', 'application/json')
+                .send(testGroup1Modi)
+                .end((err, res) => {
+                expect(err).to.be.null;
+                expect(res).to.have.status(200);
+                done();
+                });
+            });
+        it('Should change name of testGroup2 by query', (done) => {
+                chai
+                    .request(app)
+                    .patch(`/groups/group/?id=GroupTest2`)
+                    .set('Content-Type', 'application/json')
+                    .send(testGroup2Modi)
+                    .end((err, res) => {
+                    expect(err).to.be.null;
+                    expect(res).to.have.status(200);
+                    done();
+                    });
+                });
+    });
+    //Obtener usuarios
+    describe('GET /:Group', () => {
+        it('should all the Groups', (done) => {
+            chai
+                .request(app)
+                .get(`/groups/groups`)
+                .set('Content-Type', 'application/json')
+                .end((err, res) => {
+                console.log(res.body)
+                expect(res).to.have.status(200);
+                done();
+                });
+            });
+            it('should get testGroup1 by id', (done) => {
+                chai
+                    .request(app)
+                    .get(`/groups/group/${_idTestGroup}`)
+                    .set('Content-Type', 'application/json')
+                    .end((err, res) => {
+                    console.log(res.body)
+                    expect(res).to.have.status(200);
+                    done();
+                    });
+                });
+                it('should get testGroup2 by _query', (done) => {
+                    chai
+                        .request(app)
+                        .get(`/groups/group/?id=GroupTest2`)
+                        .set('Content-Type', 'application/json')
+                        .end((err, res) => {
+                        console.log(res.body)
+                        expect(res).to.have.status(200);
+                        done();
+                        });
+                    });
+    });
+    //Borrar usuarios
+    
+    describe('Delete /?Group', () => {
+        it('should delete the tests Group 1 by id', (done) => {
+            chai
+                .request(app)
+                .delete(`/groups/group/${_idTestGroup}`)
+                .set('Content-Type', 'application/json')
+                .end((err, res) => {
+                expect(res).to.have.status(200);
+                done();
+                });
+            });
+        it('should delete the tests Group 2 by query', (done) => {
+        chai
+            .request(app)
+            .delete(`/groups/group/?id=GroupTest2`)
+            .set('Content-Type', 'application/json')
+            .end((err, res) => {
+            expect(res).to.have.status(200);
+            done();
+            });
+        });
+    });
+});
 ````	
+Las funciones del controlador incluyen:
+
+- getGroups: obtiene todos los grupos de la base de datos y devuelve un JSON con los grupos encontrados o un mensaje de error si se produce un error.
+- getGroupById: obtiene un grupo por ID y devuelve información sobre el grupo, como las rutas favoritas del grupo, la clasificación de los usuarios y las estadísticas de la historia del grupo. El controlador también maneja la búsqueda de grupos por un parámetro de consulta de ID.
+- createGroup: crea un nuevo grupo en la base de datos.
+- updateGroup: actualiza un grupo existente en la base de datos.
+- deleteGroup: elimina un grupo existente de la base de datos.
+- addTrackToHistory: agrega una ruta al historial de un grupo determinado. La función toma el ID del grupo y la información de la ruta (fecha y ruta) del cuerpo de la solicitud y luego actualiza el historial de rutas del grupo.
 
 #### TrackController.ts <a name="trackController"></a>
 
+> El controlador de rutas se encarga de manejar las solicitudes relacionadas con las rutas. Las funciones del controlador incluyen:
+
 ````typescript	
+import { Request, Response } from 'express';
+import { trackModel } from '../models/trackSchema.js';
+
+// Obtener todas las Rutas
+export const getTracks = async (req: Request, res: Response) => {
+  try {
+    const tracks = await trackModel.find();
+    res.status(200).json(tracks);
+    console.log('Rutas obtenidas correctamente');
+  } catch (error : any) {
+    res.status(500).json({ message: error.message });
+    console.log('Error al obtener las rutas');
+  }
+};
+
+// Obtener una Ruta por su ID
+export const getTrackById = async (req: Request, res: Response) => {
+  try {
+    const query = req.query;
+    if (query && query.id) {
+      const Track = await trackModel.findOne({ id: query.id });
+      if (!Track) {
+        res.status(404).json({ message: 'Ruta no encontrada' });
+      } else {
+        res.status(200).json(Track);
+      }
+    } else {
+      const { id } = req.params;
+      const Track = await trackModel.findById(id);
+      if (!Track) {
+        res.status(404).json({ message: 'Ruta no encontrada' });
+      } else {
+        res.status(200).json(Track);
+      }
+    }
+  } catch (error : any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Crear una nueva Ruta
+export const createTrack = async (req: Request, res: Response) => {
+  try {
+    const track = new trackModel(req.body);
+    await track.save();
+    res.status(200).json({ message: 'Ruta creada correctamente' , track });
+  } catch (error : any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Actualizar una Ruta existente
+export const updateTrack = async (req: Request, res: Response) => {
+  try {
+    const query = req.query;
+    if (query && query.id) {
+      const Track = await trackModel.findOneAndUpdate({ id: query.id }, req.body, { new: true });
+      if (!Track) {
+        res.status(404).json({ message: 'Ruta no encontrada' });
+      } else {
+        res.status(200).json({ message: 'Ruta actualizada correctamente' });
+      }
+    } else {
+      const { id } = req.params;
+      const Track = await trackModel.findByIdAndUpdate(id, req.body, { new: true });
+      if (!Track) {
+        res.status(404).json({ message: 'Ruta no encontrada' });
+      } else {
+        res.status(200).json({ message: 'Ruta actualizada correctamente' });
+      }
+    }
+  } catch (error : any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Eliminar una Ruta existente
+export const deleteTrack = async (req: Request, res: Response) => {
+  try {
+    const query = req.query;
+    if (query && query.id) {
+      const Track = await trackModel.findOneAndDelete({ id: query.id });
+      if (!Track) {
+        res.status(404).json({ message: 'Ruta no encontrada' });
+      } else {
+        res.status(200).json({ message: 'Ruta borrada correctamente' });
+      }
+    } else {
+      const { id } = req.params;
+      const Track = await trackModel.findByIdAndDelete(id);
+      if (!Track) {
+        res.status(404).json({ message: 'Ruta no encontrada' });
+      } else {
+        res.status(200).json({ message: 'Ruta borrada correctamente' });
+      }
+    }
+  } catch (error : any) {
+    res.status(500).json({ message: error.message });
+  }
+};
 ````	
+Las funciones del controlador incluyen:
+
+- La función getTracks maneja la operación de Leer todos los registros de la entidad "ruta". Primero, usa el modelo trackModel para obtener todos los registros de la base de datos usando find(). Luego, envía una respuesta JSON con los registros obtenidos y un código de estado HTTP 200 (OK). Si hay algún error durante la operación, envía una respuesta de error con un mensaje de error y un código de estado HTTP 500 (Error interno del servidor).
+- La función getTrackById maneja la operación de Leer un registro específico de la entidad "ruta" por su ID. Primero, revisa si el ID es proporcionado en la consulta. Si es así, utiliza findOne() para buscar el registro en la base de datos y envía una respuesta JSON con el registro encontrado y un código de estado HTTP 200 (OK). Si no se encuentra el registro, envía una respuesta de error con un mensaje de error y un código de estado HTTP 404 (No encontrado). Si el ID no se proporciona en la consulta, la función utiliza findById() para buscar el registro en la base de datos utilizando el ID proporcionado en los parámetros de la solicitud.
+- La función createTrack maneja la operación de Crear un nuevo registro en la entidad "ruta". Crea un nuevo objeto track utilizando el modelo trackModel y lo guarda en la base de datos usando save(). Luego, envía una respuesta JSON con un mensaje de éxito y el objeto track creado y un código de estado HTTP 200 (OK). Si hay algún error durante la operación, envía una respuesta de error con un mensaje de error y un código de estado HTTP 500 (Error interno del servidor).
+- La función updateTrack maneja la operación de Actualizar un registro existente en la entidad "ruta". Revisa si el ID es proporcionado en la consulta o en los parámetros de la solicitud y utiliza findOneAndUpdate() o findByIdAndUpdate() para actualizar el registro en la base de datos. Si el registro se actualiza correctamente, envía una respuesta JSON con un mensaje de éxito y un código de estado HTTP 200 (OK). Si no se encuentra el registro, envía una respuesta de error con un mensaje de error y un código de estado HTTP 404 (No encontrado).
+- La función deleteTrack maneja la operación de Borrar un registro existente en la entidad "ruta". Revisa si el ID es proporcionado en la consulta o en los parámetros de la solicitud y utiliza findOneAndDelete() o findByIdAndDelete() para eliminar el registro de la base de datos. Si el registro se elimina correctamente, envía una respuesta JSON con un mensaje de éxito y un código de estado HTTP 200 (OK). Si no se encuentra el registro, envía una respuesta de error con un mensaje de error y un código de estado HTTP 404 (No encontrado).
 
 #### UserController.ts <a name="userController"></a>
 
+> El controlador de usuario contiene las funciones que se encargan de manejar las peticiones que se realizan a la entidad usuario.
+
 ````typescript	
+import { Request, Response } from 'express';
+import { userModel } from '../models/userSchema.js';
+import { challengeModel } from '../models/challengeSchema.js';
+import { groupModel } from '../models/groupSchema.js';
+import { historyFunction, favoriteRoutes, activeChallenges, getGroupForUser} from '../utils/functions.js';
+import mongoose from 'mongoose';
+
+// Obtener todos los usuarios
+export const getUsers = async (req: Request, res: Response) => {
+  try {
+      const users = await userModel.find().populate('friends', 'name').populate('historicTracks', 'name');
+      res.status(200).json(users);
+      console.log('Usuarios obtenidos correctamente');
+    } catch (error : any) {
+    res.status(500).json({ message: error.message });
+    console.log('Error al obtener los usuarios');
+  }
+};
+
+// Obtener un usuario por su ID o por nombre
+export const getUserById = async (req: Request, res: Response) => {
+  try {
+    const query = req.query;
+    if (query && query.id) {
+      const user = await userModel.findOne({ id: query.id }).populate('friends',['id','name']).populate('historicTracks.track');
+      if (!user) {
+        res.status(404).json({ message: 'Usuario no encontrado' });
+      } else {
+        const Groups = await groupModel.find().populate('participants.user', ['id','name'])
+        const activeGroups = getGroupForUser(Groups, user.id)
+        const stats = historyFunction(user.historicTracks);
+        const favTracks = favoriteRoutes(user.historicTracks);
+        const challenges = await challengeModel.find();
+        const activChallenges = activeChallenges(challenges, user._id.toString());
+        res.status(200).json({user: user, activeGroups, stats:{"km semanales": stats[0],"Desnivel semanal": stats[1], "km mensuales": stats[2],"Desnivel mensual": stats[3], "km anuales": stats[4], "Desnivel anual": stats[5]}, favTracks, activChallenges});
+      }
+    } else {
+      const { id } = req.params;
+      const user = await userModel.findById(id).populate('friends', 'name').populate('historicTracks.track');
+      if (!user) {
+        res.status(404).json({ message: 'Usuario no encontrado' });
+      } else {
+        const stats = historyFunction(user.historicTracks);
+        const favTracks = favoriteRoutes(user.historicTracks);
+        const challenges = await challengeModel.find();
+        const activChallenges = activeChallenges(challenges, user._id.toString());
+        res.status(200).json({user: user, stats:{"km semanales": stats[0],"Desnivel semanal": stats[1], "km mensuales": stats[2],"Desnivel mensual": stats[3], "km anuales": stats[4], "Desnivel anual": stats[5]}, favTracks, activChallenges});
+      }
+    }
+  } catch (error : any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Crear un nuevo usuario
+export const createUser = async (req: Request, res: Response) => {
+  try {
+    const user = new userModel(req.body);
+    await user.save();
+    res.status(200).json({ message: 'Usuario creado correctamente', user });
+  } catch (error : any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Actualizar un usuario existente
+export const updateUser = async (req: Request, res: Response) => {
+  try {
+    const query = req.query;
+    if (query && query.id) {
+      const user = await userModel.findOneAndUpdate({ id: query.id }, req.body, { new: true });
+      if (!user) {
+        res.status(404).json({ message: 'Usuario no encontrado' });
+      } else {
+        res.status(200).json({ message: 'Usuario actualizado correctamente' });
+      }
+    } else {
+      const { id } = req.params;
+      const user = await userModel.findByIdAndUpdate(id, req.body, { new: true });
+      if (!user) {
+        res.status(404).json({ message: 'Usuario no encontrado' });
+      } else {
+        res.status(200).json({ message: 'Usuario actualizado correctamente' });
+      }
+    }
+  } catch (error : any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Eliminar un usuario existente
+export const deleteUser = async (req: Request, res: Response) => {
+  try {
+    const query = req.query;
+    if (query && query.id) {
+      const user = await userModel.findOneAndDelete({ id: query.id });
+      if (!user) {
+        res.status(404).json({ message: 'Usuario no encontrado' });
+      } else {
+        res.status(200).json({ message: 'Usuario borrado correctamente' });
+      }
+    } else {
+      const { id } = req.params;
+      const user = await userModel.findByIdAndDelete(id);
+      if (!user) {
+        res.status(404).json({ message: 'Usuario no encontrado' });
+      } else {
+        res.status(200).json({ message: 'Usuario borrado correctamente' });
+      }
+    }
+  } catch (error : any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const addTrackToHistory = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.id;
+    const { date, track } = req.body; // Asegúrate de que el cuerpo de la petición incluye la fecha y el ID de la ruta
+    // Encuentra el usuario y actualiza su array historicTracks
+    const user = await userModel.findByIdAndUpdate(
+      userId, 
+      { $push: { historicTracks: { date: new Date(date), track: track } } }, 
+      { new: true, useFindAndModify: false } // new: true para devolver el documento actualizado, useFindAndModify: false para utilizar el método findOneAndUpdate de Mongoose en lugar del método findAndModify de MongoDB
+    );
+
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+
+    return res.send(user);
+
+  } catch (error) {
+    return res.status(500).send('Server error');
+  }
+};
 ````	
+
+Las funciones de controlador de usuario se definen de la siguiente manera:
+
+- getUsers: Esta función maneja una solicitud GET a la ruta "/users" y devuelve una lista de todos los usuarios en la base de datos. Se utiliza el método find() del modelo userModel para obtener todos los usuarios y se utiliza el método populate() para incluir información adicional sobre los usuarios, como sus amigos y las rutas que han completado. Si la solicitud se realiza correctamente, la función devuelve un objeto JSON con una clave "usuarios" que contiene la lista de usuarios.
+- getUserById: Esta función maneja una solicitud GET a la ruta "/users/:id" y devuelve información detallada sobre un usuario específico. Si el parámetro id se proporciona como una consulta en la solicitud, se utiliza el método findOne() del modelo userModel para buscar un usuario con el ID especificado y se utiliza el método populate() para incluir información adicional sobre el usuario. Si el parámetro id se proporciona como una parte de la ruta en la solicitud, se utiliza el método findById() del modelo userModel para buscar un usuario con el ID especificado y se utiliza el método populate() para incluir información adicional sobre el usuario. La función devuelve un objeto JSON con información detallada sobre el usuario, incluyendo estadísticas de historial de rutas, rutas favoritas y desafíos activos.
+- createUser: Esta función maneja una solicitud POST a la ruta "/users" y crea un nuevo usuario en la base de datos utilizando el modelo userModel. Si la creación de usuario se realiza correctamente, la función devuelve un objeto JSON con un mensaje de confirmación y el usuario creado.
+- updateUser: Esta función maneja una solicitud PUT a la ruta "/users/:id" y actualiza la información de un usuario específico en la base de datos utilizando el modelo userModel. Si el parámetro id se proporciona como una consulta en la solicitud, se utiliza el método findOneAndUpdate() del modelo userModel para buscar y actualizar un usuario con el ID especificado. Si el parámetro id se proporciona como una parte de la ruta en la solicitud, se utiliza el método findByIdAndUpdate() del modelo userModel para buscar y actualizar un usuario con el ID especificado. Si la actualización se realiza correctamente, la función devuelve un objeto JSON con un mensaje de confirmación.
+- deleteUser: Esta función maneja una solicitud DELETE a la ruta "/users/:id" y elimina un usuario específico de la base de datos utilizando el modelo userModel. Si el parámetro id se proporciona como una consulta en la solicitud, se utiliza el método findOneAndDelete() del modelo userModel para buscar y eliminar un usuario con el ID especificado. Si el parámetro id se proporciona como una parte de la ruta en la solicitud, se utiliza el método findByIdAndDelete() del modelo userModel para buscar y eliminar un usuario con el ID especificado. Si la eliminación se realiza correctamente, la función devuelve un objeto JSON con un mensaje de confirmación.
+- addTrackToHistory: Esta función maneja una solicitud POST a la ruta "/users/:id/history" y agrega una nueva ruta al historial de rutas de un usuario identificado por su "id". La nueva ruta se agrega al final de la lista existente de rutas del usuario.
 
 ### Base de datos <a name="database"></a>
 > [Volver al índice](#índice)
@@ -709,6 +1260,7 @@ La conexión se establece utilizando la función connect() de Mongoose, que reci
 
 La función connect() devuelve una promesa, que se maneja con la función then() y catch(). Si la conexión se establece correctamente, se ejecuta la función then() y se escribe en la consola el mensaje "Connected to the database". Si hay algún error al conectarse a la base de datos, se ejecuta la función catch() y se escribe en la consola el mensaje "Something went wrong when connecting to the database".
 
+Además, se ha hecho uso de MongoDB Atlas para poder desplegar la aplicación en Cyclic. Para ello, se ha creado una base de datos en MongoDB Atlas y se ha cambiado la cadena de conexión URI a la base de datos MongoDB.
 
 ### Programa principal <a name="principal"></a>
 > [Volver al índice](#índice)
@@ -758,7 +1310,7 @@ console.log(Date.now())
 export default app;
 ````
 
-Este código represent a una aplicación de servidor Node.js que utiliza el framework Express para manejar las solicitudes HTTP y la biblioteca Mongoose para conectarse a una base de datos MongoDB.
+Este código representa a nuestra aplicación de servidor Node.js, que utiliza el Express para manejar las solicitudes HTTP y la biblioteca Mongoose para conectarse a una base de datos MongoDB.
 
 Primero, se importan los módulos necesarios, incluyendo Express, Cors y Mongoose, así como los enrutadores de usuario, track, group y challenge desde los archivos de ruta correspondientes. A continuación, se crea una instancia de la aplicación Express utilizando la función express().
 
