@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 
-const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://user:user123ASDFG@cluster0.mow4vh4.mongodb.net/?retryWrites=true&w=majority";
+const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://user:user123ASDFG@cluster0.mow4vh4.mongodb.net/destravate";
 
 connect(MONGO_URI).then(() => {
   console.log('Connection to MongoDB server established');
