@@ -19,6 +19,7 @@ jobs:
           wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
           unzip sonar-scanner-cli-4.6.2.2472-linux.zip
           export PATH=$PATH:$PWD/sonar-scanner-cli-4.6.2.2472-linux/bin
+          sonar-scanner -X
       - name: Using Node.js 19.x
         uses: actions/setup-node@v3
         with:
@@ -27,9 +28,9 @@ jobs:
         run: npm i
       - name: Generating coverage report
         run: npm run coverage
-      - name: SonarCloud Scan
+      #- name: SonarCloud Scan
         # uses: SonarSource/sonarcloud-github-action@master
-        run: sonar-scanner -X
+        #run: sonar-scanner -X
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
