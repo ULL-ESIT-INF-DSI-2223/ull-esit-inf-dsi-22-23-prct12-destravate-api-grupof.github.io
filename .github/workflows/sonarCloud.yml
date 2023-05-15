@@ -23,7 +23,7 @@ jobs:
         run: npm i
       - name: Generating coverage report
         run: npm run coverage
-      - name: SonarCloud Scan
+      - name: SonarCloud Scan -X
         uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
