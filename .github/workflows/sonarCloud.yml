@@ -14,6 +14,11 @@ jobs:
         with:
           sonar.branch.name: "main"
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          - name: Install SonarScanner
+        run: |
+          wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
+          unzip sonar-scanner-cli-4.6.2.2472-linux.zip
+          export PATH=$PATH:$PWD/sonar-scanner-cli-4.6.2.2472-linux/bin
       - name: Using Node.js 19.x
         uses: actions/setup-node@v3
         with:
