@@ -3,6 +3,12 @@ import { challengeModel } from '../models/challengeSchema.js';
 import { challengeLongAndUnevennes } from '../utils/functions.js';
 
 // Obtener todos los Retos
+
+/**
+ * Función que obtiene todos los retos de la base de datos
+ * @param req 
+ * @param res 
+ */
 export const getChallenges = async (req: Request, res: Response) => {
   try {
 
@@ -18,6 +24,12 @@ export const getChallenges = async (req: Request, res: Response) => {
 };
 
 // Obtener una Reto por su ID
+
+/**
+ * Función que obtiene un reto por su id
+ * @param req
+ * @param res
+ */
 export const getChallengeById = async (req: Request, res: Response) => {
   try {
     const query = req.query;
@@ -45,6 +57,12 @@ export const getChallengeById = async (req: Request, res: Response) => {
 };
 
 // Crear una nueva Reto
+
+/**
+ * Función que crea un nuevo reto
+ * @param req
+ * @param res
+ */
 export const createChallenge = async (req: Request, res: Response) => {
   try {
     const challenge = new challengeModel(req.body);
@@ -56,6 +74,12 @@ export const createChallenge = async (req: Request, res: Response) => {
 };
 
 // Actualizar una Reto existente
+
+/**
+ * Función que actualiza un reto existente
+ * @param req
+ * @param res
+ */
 export const updateChallenge = async (req: Request, res: Response) => {
   try {
     const query = req.query;
@@ -81,6 +105,12 @@ export const updateChallenge = async (req: Request, res: Response) => {
 };
 
 // Eliminar una Reto existente
+
+/**
+ * Función que elimina un reto existente
+ * @param req
+ * @param res
+ */
 export const deleteChallenge = async (req: Request, res: Response) => {
   try {
     const query = req.query;

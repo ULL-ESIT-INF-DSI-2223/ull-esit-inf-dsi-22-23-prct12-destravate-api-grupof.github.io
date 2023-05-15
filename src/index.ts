@@ -25,12 +25,19 @@ app.use('/tracks', trackRouter);
 app.use('/groups', groupRouter);
 app.use('/challenges', challengeRouter);
 
+/**
+ * Ruta por defecto
+ * @route GET /
+ */
 app.use('/', (req, res) => {
   res.send('Hello World!');
 });
 
 const PORT = process.env.PORT || 4000;
 
+/**
+ * Iniciar servidor
+ */
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });

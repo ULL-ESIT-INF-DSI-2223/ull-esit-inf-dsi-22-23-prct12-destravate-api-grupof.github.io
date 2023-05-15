@@ -6,6 +6,12 @@ import { historyFunction, favoriteRoutes, activeChallenges, getGroupForUser} fro
 import mongoose from 'mongoose';
 
 // Obtener todos los usuarios
+
+/**
+ * Función que obtiene todos los usuarios de la base de datos
+ * @param req
+ * @param res
+ */
 export const getUsers = async (req: Request, res: Response) => {
   try {
       const users = await userModel.find().populate('friends', 'name').populate('historicTracks', 'name');
@@ -18,6 +24,12 @@ export const getUsers = async (req: Request, res: Response) => {
 };
 
 // Obtener un usuario por su ID o por nombre
+
+/**
+ * Función que obtiene un usuario por su id o por su nombre
+ * @param req
+ * @param res
+ */
 export const getUserById = async (req: Request, res: Response) => {
   try {
     const query = req.query;
@@ -53,6 +65,12 @@ export const getUserById = async (req: Request, res: Response) => {
 };
 
 // Crear un nuevo usuario
+
+/**
+ * Función que crea un nuevo usuario
+ * @param req
+ * @param res
+ */
 export const createUser = async (req: Request, res: Response) => {
   try {
     const user = new userModel(req.body);
@@ -64,6 +82,12 @@ export const createUser = async (req: Request, res: Response) => {
 };
 
 // Actualizar un usuario existente
+
+/**
+ * Función que actualiza un usuario existente
+ * @param req
+ * @param res
+ */
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const query = req.query;
@@ -89,6 +113,12 @@ export const updateUser = async (req: Request, res: Response) => {
 };
 
 // Eliminar un usuario existente
+
+/**
+ * Función que elimina un usuario existente
+ * @param req
+ * @param res
+ */
 export const deleteUser = async (req: Request, res: Response) => {
   try {
     const query = req.query;
@@ -113,6 +143,13 @@ export const deleteUser = async (req: Request, res: Response) => {
   }
 };
 
+// Obtener el histórico de rutas de un usuario
+
+/**
+ * Función que obtiene el histórico de rutas de un usuario
+ * @param req
+ * @param res
+ */
 export const addTrackToHistory = async (req: Request, res: Response) => {
   try {
     const userId = req.params.id;

@@ -9,6 +9,16 @@ Clasificación de los usuarios: Ranking de los usuarios que más entrenamientos 
 Rutas favoritas del grupo: Rutas que los usuarios del grupo han realizado con mayor frecuencia en sus salidas conjuntas.
 Histórico de rutas realizadas por el grupo: Información similar que almacenan los usuarios pero en este caso referente a los grupos. Nótese que un usuario puede realizar rutas con un grupo y/o de manera individual el mismo día. Es decir, a modo de simplificación, asumimos que todos los usuarios de un grupo realizan la actividad cuando se planifica. Aunque, también pueden realizar otras actividades de manera individual.*/
 
+/**
+ * Interfaz que define las propiedades que debe tener un grupo
+ * @property id ID único del grupo.
+ * @property name Nombre del grupo.
+ * @property participants Participantes: IDs de los miembros del grupo.
+ * @property stats Estadísticas de entrenamiento grupal: Cantidad de km y desnivel total acumulados de manera grupal en la semana, mes y año
+ * @property ranking Clasificación de los usuarios: Ranking de los usuarios que más entrenamientos han realizado históricamente dentro del grupo, es decir, ordenar los usuarios por la cantidad de km totales o desnivel total que han acumulado.
+ * @property favoriteRoutes Rutas favoritas del grupo: Rutas que los usuarios del grupo han realizado con mayor frecuencia en sus salidas conjuntas.
+ * @property historicTracks Histórico de rutas realizadas por el grupo: Información similar que almacenan los usuarios pero en este caso referente a los grupos. Nótese que un usuario puede realizar rutas con un grupo y/o de manera individual el mismo día. Es decir, a modo de simplificación, asumimos que todos los usuarios de un grupo realizan la actividad cuando se planifica. Aunque, también pueden realizar otras actividades de manera individual.
+ */
 interface groupDocumentInterface extends Document {
     id: string;
     name: string;
@@ -19,6 +29,17 @@ interface groupDocumentInterface extends Document {
     historicTracks: {date: Date, _id: Schema.Types.ObjectId }[];
   }
 
+
+/**
+ * Esquema de Mongoose para los grupos
+ * @property id ID único del grupo.
+ * @property name Nombre del grupo.
+ * @property participants Participantes: IDs de los miembros del grupo.
+ * @property stats Estadísticas de entrenamiento grupal: Cantidad de km y desnivel total acumulados de manera grupal en la semana, mes y año
+ * @property ranking Clasificación de los usuarios: Ranking de los usuarios que más entrenamientos han realizado históricamente dentro del grupo, es decir, ordenar los usuarios por la cantidad de km totales o desnivel total que han acumulado.
+ * @property favoriteRoutes Rutas favoritas del grupo: Rutas que los usuarios del grupo han realizado con mayor frecuencia en sus salidas conjuntas.
+ * @property historicTracks Histórico de rutas realizadas por el grupo: Información similar que almacenan los usuarios pero en este caso referente a los grupos. Nótese que un usuario puede realizar rutas con un grupo y/o de manera individual el mismo día. Es decir, a modo de simplificación, asumimos que todos los usuarios de un grupo realizan la actividad cuando se planifica. Aunque, también pueden realizar otras actividades de manera individual.
+ */
 const groupSchema = new Schema<groupDocumentInterface>({
     id: {
         type: String,

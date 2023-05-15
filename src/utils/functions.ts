@@ -3,6 +3,7 @@ export function historyFunction(historicTracks: any): number []{
   
   
   // Obtén la fecha actual y calcula las fechas de inicio para la semana, el mes y el año pasado
+
   const now = new Date();
   const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
@@ -10,6 +11,11 @@ export function historyFunction(historicTracks: any): number []{
 
   const result: number[] = [0,0,0,0,0,0]
   const cont: number[] = [0,0,0]
+
+  /**
+   * Recorre el histórico de rutas y suma la longitud y la desigualdad de las pistas
+   * de la semana pasada, el mes pasado y el año pasado.
+   */
   historicTracks.forEach((track: any) => {
     // Convierte la fecha de la pista en un objeto Date
     const trackDate = new Date(track.date);
@@ -53,6 +59,11 @@ export function historyFunction(historicTracks: any): number []{
 
 }
 
+/**
+ * Funcion que devuelve las rutas favoritas
+ * @param historicTracks 
+ * @returns 
+ */
 export function favoriteRoutes(historicTracks: any): {id: string, name: string, count: number }[] {
   const routeCounts: { [key: string]: number } = {};
 
@@ -79,6 +90,10 @@ export function favoriteRoutes(historicTracks: any): {id: string, name: string, 
   return topRoutes;
 }
 
+/**
+ * Funcion que devuelve las rutas favoritas
+ * @param historicTracks
+ */
 export function activeChallenges(challenges: any, id: string) {
    //Buscar en el campo users los ids que coincidan con el id recibido
    const result: {_id: Schema.Types.ObjectId, id: string, name: string} [] = [];
@@ -93,6 +108,10 @@ export function activeChallenges(challenges: any, id: string) {
 
 }
 
+/**
+ * Funcion que devuelve los la longitud y la desigualdad de las rutas de los retos
+ * @param historicTracks
+ */
 export function challengeLongAndUnevennes(challenges: any[]): {challenge: any, kmTotal: number, unevenness: number }[] {
   const challengesfinal: {challenge: any, kmTotal: number, unevenness: number }[] = [];
     challenges.forEach((challenge: any) => {
@@ -110,6 +129,9 @@ export function challengeLongAndUnevennes(challenges: any[]): {challenge: any, k
     return challengesfinal;
 }
 
+/**
+ * Funcion que devuelve las clasicaciones de los usuarios
+ */
 export function groupClasificationUsers(participants: any, historicTracks:any): {byKms:{id: string,name: string, long: number, unevenness: number}[],byUnevenness:{id: string,name: string, long: number, unevenness: number }[]}{
   const resultKms: {id: string,name: string, long: number, unevenness: number }[] = [];
   const resultUnevenness: {id: string,name: string, long: number, unevenness: number }[]= [];

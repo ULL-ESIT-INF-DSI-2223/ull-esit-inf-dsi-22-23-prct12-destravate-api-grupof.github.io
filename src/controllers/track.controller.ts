@@ -2,6 +2,12 @@ import { Request, Response } from 'express';
 import { trackModel } from '../models/trackSchema.js';
 
 // Obtener todas las Rutas
+
+/**
+ * Función que obtiene todas las rutas de la base de datos
+ * @param req
+ * @param res
+ */
 export const getTracks = async (req: Request, res: Response) => {
   try {
     const tracks = await trackModel.find();
@@ -13,7 +19,13 @@ export const getTracks = async (req: Request, res: Response) => {
   }
 };
 
-// Obtener una Ruta por su ID
+// Obtener una Ruta por su IDç
+
+/**
+ * Función que obtiene una ruta por su id
+ * @param req
+ * @param res
+ */
 export const getTrackById = async (req: Request, res: Response) => {
   try {
     const query = req.query;
@@ -39,6 +51,12 @@ export const getTrackById = async (req: Request, res: Response) => {
 };
 
 // Crear una nueva Ruta
+
+/**
+ * Función que crea una nueva ruta
+ * @param req
+ * @param res
+ */
 export const createTrack = async (req: Request, res: Response) => {
   try {
     const track = new trackModel(req.body);
@@ -50,6 +68,12 @@ export const createTrack = async (req: Request, res: Response) => {
 };
 
 // Actualizar una Ruta existente
+
+/**
+ * Función que actualiza una ruta existente
+ * @param req
+ * @param res
+ */
 export const updateTrack = async (req: Request, res: Response) => {
   try {
     const query = req.query;
@@ -75,6 +99,12 @@ export const updateTrack = async (req: Request, res: Response) => {
 };
 
 // Eliminar una Ruta existente
+
+/**
+ * Función que elimina una ruta existente
+ * @param req
+ * @param res
+ */
 export const deleteTrack = async (req: Request, res: Response) => {
   try {
     const query = req.query;

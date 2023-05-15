@@ -6,6 +6,12 @@ import { historyFunction, favoriteRoutes, groupClasificationUsers} from '../util
 import { Types, Schema } from 'mongoose';
 
 // Obtener todas las Grupos
+
+/**
+ * Función que obtiene todos los grupos de la base de datos
+ * @param req
+ * @param res
+ */
 export const getGroups = async (req: Request, res: Response) => {
   try {
    
@@ -19,6 +25,12 @@ export const getGroups = async (req: Request, res: Response) => {
 };
 
 // Obtener una Grupo por su ID
+
+/**
+ * Función que obtiene un grupo por su id
+ * @param req
+ * @param res
+ */
 export const getGroupById = async (req: Request, res: Response) => {
   console.log(req.params)
   try {
@@ -50,6 +62,12 @@ export const getGroupById = async (req: Request, res: Response) => {
 };
 
 // Crear una nueva Grupo
+
+/**
+ * Función que crea un grupo
+ * @param req
+ * @param res
+ */
 export const createGroup = async (req: Request, res: Response) => {
   try {
     const group = new groupModel(req.body);
@@ -61,6 +79,12 @@ export const createGroup = async (req: Request, res: Response) => {
 };
 
 // Actualizar una Grupo existente
+
+/**
+ * Función que actualiza un grupo
+ * @param req
+ * @param res
+ */
 export const updateGroup = async (req: Request, res: Response) => {
   try {
     const query = req.query;
@@ -86,6 +110,12 @@ export const updateGroup = async (req: Request, res: Response) => {
 };
 
 // Eliminar una Grupo existente
+
+/**
+ * Función que elimina un grupo
+ * @param req
+ * @param res
+ */
 export const deleteGroup = async (req: Request, res: Response) => {
   try {
     const query = req.query;
@@ -110,6 +140,13 @@ export const deleteGroup = async (req: Request, res: Response) => {
   }
 };
 
+// Obtener el historial de rutas de un Grupo
+
+/**
+ * Función que obtiene el historial de rutas de un grupo
+ * @param req
+ * @param res
+ */
 export const addTrackToHistory = async (req: Request, res: Response) => {
   try {
     const groupId = req.params.id;
@@ -132,6 +169,13 @@ export const addTrackToHistory = async (req: Request, res: Response) => {
   }
 };
 
+// Obtener el historial de rutas de un Grupo
+
+/**
+ * Función que obtiene el historial de rutas de un grupo
+ * @param req
+ * @param res
+ */
 export const addUserToGroup = async (req: Request, res: Response) => {
   try {
     const groupId = req.params.id;
