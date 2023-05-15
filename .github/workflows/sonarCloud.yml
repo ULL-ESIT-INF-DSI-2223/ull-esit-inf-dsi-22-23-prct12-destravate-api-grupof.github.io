@@ -12,6 +12,7 @@ jobs:
       - name: Cloning repo
         uses: actions/checkout@v3
         with:
+          sonar.branch.name: "main"
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Using Node.js 19.x
         uses: actions/setup-node@v3
