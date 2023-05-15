@@ -4,6 +4,8 @@
 
 [![Coveralls](https://github.com/ULL-ESIT-INF-DSI-2223/ull-esit-inf-dsi-22-23-prct12-destravate-api-grupof.github.io/actions/workflows/coveralls.yml/badge.svg)](https://github.com/ULL-ESIT-INF-DSI-2223/ull-esit-inf-dsi-22-23-prct12-destravate-api-grupof.github.io/actions/workflows/coveralls.yml)
 
+[![Tests](https://github.com/ULL-ESIT-INF-DSI-2223/ull-esit-inf-dsi-22-23-prct12-destravate-api-grupof.github.io/actions/workflows/node.js.yml/badge.svg)](https://github.com/ULL-ESIT-INF-DSI-2223/ull-esit-inf-dsi-22-23-prct12-destravate-api-grupof.github.io/actions/workflows/node.js.yml)
+
 ## Carla Oval Torres, Jairo Alonso Abreu, Gabi Vacaru.
 
 ## Índice <a name="índice"></a>
